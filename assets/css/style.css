@@ -1,0 +1,407 @@
+/* ===========================
+GLOBAL
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#f8fafc;
+    color:#333;
+}
+
+a{
+    text-decoration:none;
+}
+
+img{
+    max-width:100%;
+    display:block;
+}
+
+.section-title{
+    font-size:2.5rem;
+    font-weight:700;
+    margin-bottom:50px;
+    text-align:center;
+}
+
+/* ===========================
+NAVBAR
+=========================== */
+
+.navbar{
+    background:#111827 !important;
+    padding:18px 0;
+}
+
+.navbar-brand{
+    font-size:2rem;
+    font-weight:700;
+    color:#fff !important;
+}
+
+.nav-link{
+    color:#fff !important;
+    margin-left:12px;
+    transition:.3s;
+    font-weight:500;
+}
+
+.nav-link:hover{
+    color:#3b82f6 !important;
+}
+
+.form-control{
+    border-radius:30px;
+}
+
+.btn-primary{
+    background:#2563eb;
+    border:none;
+    border-radius:30px;
+    padding:10px 28px;
+}
+
+.btn-primary:hover{
+    background:#1d4ed8;
+}
+
+/* ===========================
+HERO
+=========================== */
+
+.hero{
+    background:linear-gradient(135deg,#2563eb,#1e3a8a);
+    color:#fff;
+    padding:120px 0;
+}
+
+.hero h1{
+    font-size:4rem;
+    font-weight:800;
+    margin-bottom:20px;
+}
+
+.hero p{
+    font-size:1.2rem;
+    margin-bottom:35px;
+}
+
+.hero .btn{
+    margin-right:15px;
+}
+
+.hero img{
+    border-radius:20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.25);
+}
+
+/* ===========================
+CATEGORIES
+=========================== */
+
+.categories{
+    padding:80px 0;
+}
+
+.category-card{
+    background:#fff;
+    border-radius:18px;
+    padding:35px;
+    text-align:center;
+    transition:.3s;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.category-card:hover{
+    transform:translateY(-10px);
+}
+
+.category-card i{
+    font-size:3rem;
+    color:#2563eb;
+    margin-bottom:20px;
+}
+
+.category-card h5{
+    font-weight:600;
+}
+
+/* ===========================
+FEATURED PRODUCTS
+=========================== */
+
+.featured-products{
+    padding:80px 0;
+    background:#f8fafc;
+}
+
+.product-card{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    transition:.35s;
+    margin-bottom:30px;
+}
+
+.product-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 18px 40px rgba(0,0,0,.15);
+}
+
+.product-card img{
+    height:250px;
+    width:100%;
+    object-fit:cover;
+}
+
+.product-body{
+    padding:20px;
+}
+
+.product-title{
+    font-size:1.2rem;
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.product-price{
+    color:#2563eb;
+    font-size:1.4rem;
+    font-weight:700;
+}
+
+.product-old-price{
+    color:#999;
+    text-decoration:line-through;
+    margin-left:10px;
+}
+
+.product-card .btn{
+    width:100%;
+    margin-top:15px;
+}
+
+/* ===========================
+DEAL SECTION
+=========================== */
+
+.deal-section{
+    background:#111827;
+    color:#fff;
+    padding:90px 0;
+    text-align:center;
+}
+
+.deal-section h2{
+    font-size:3rem;
+    font-weight:700;
+}
+
+.deal-section p{
+    font-size:1.2rem;
+    margin:20px auto 35px;
+    max-width:700px;
+}
+
+.deal-section .btn-warning{
+    padding:12px 35px;
+    border-radius:30px;
+    font-weight:600;
+}
+
+/* ===========================
+WHY CHOOSE US
+=========================== */
+
+.why-us{
+    padding:80px 0;
+}
+
+.feature-box{
+    background:#fff;
+    border-radius:18px;
+    text-align:center;
+    padding:40px 30px;
+    transition:.3s;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.feature-box:hover{
+    transform:translateY(-10px);
+}
+
+.feature-box i{
+    font-size:3rem;
+    color:#2563eb;
+    margin-bottom:20px;
+}
+
+.feature-box h4{
+    font-weight:600;
+    margin-bottom:15px;
+}
+
+.feature-box p{
+    color:#666;
+}
+
+/* ===========================
+NEWSLETTER
+=========================== */
+
+.newsletter{
+    background:#2563eb;
+    color:#fff;
+    padding:80px 0;
+    text-align:center;
+}
+
+.newsletter h2{
+    font-size:2.8rem;
+    font-weight:700;
+}
+
+.newsletter p{
+    margin:20px auto 35px;
+    max-width:700px;
+}
+
+.newsletter input{
+    border:none;
+    border-radius:30px;
+    padding:14px 20px;
+}
+
+.newsletter button{
+    border-radius:30px;
+    padding:14px 35px;
+}
+
+/* ===========================
+FOOTER
+=========================== */
+
+footer{
+    background:#111827;
+}
+
+.footer-link{
+    color:#d1d5db;
+    display:block;
+    margin-bottom:12px;
+    transition:.3s;
+}
+
+.footer-link:hover{
+    color:#3b82f6;
+    padding-left:5px;
+}
+
+.social-icon{
+    width:45px;
+    height:45px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:#1f2937;
+    color:#fff;
+    border-radius:50%;
+    margin-right:10px;
+    transition:.3s;
+    font-size:1.2rem;
+}
+
+.social-icon:hover{
+    background:#2563eb;
+    color:#fff;
+    transform:translateY(-5px);
+}
+
+/* ===========================
+UTILITIES
+=========================== */
+
+.shadow-custom{
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+.rounded-xl{
+    border-radius:20px;
+}
+
+.py-100{
+    padding:100px 0;
+}
+
+/* ===========================
+RESPONSIVE
+=========================== */
+
+@media(max-width:992px){
+
+    .hero{
+        text-align:center;
+        padding:90px 0;
+    }
+
+    .hero h1{
+        font-size:3rem;
+    }
+
+    .hero img{
+        margin-top:40px;
+    }
+
+    .navbar form{
+        margin:20px 0;
+    }
+
+}
+
+@media(max-width:768px){
+
+    .hero h1{
+        font-size:2.3rem;
+    }
+
+    .section-title{
+        font-size:2rem;
+    }
+
+    .deal-section h2{
+        font-size:2rem;
+    }
+
+    .newsletter h2{
+        font-size:2rem;
+    }
+
+}
+
+@media(max-width:576px){
+
+    .hero{
+        padding:70px 0;
+    }
+
+    .btn-primary{
+        width:100%;
+        margin-bottom:15px;
+    }
+
+    .hero .btn{
+        width:100%;
+    }
+
+}
