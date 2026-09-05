@@ -362,10 +362,6 @@ While building TechCart, I gained practical experience in:
 
 University of Ghana
 
-GitHub:
-
-https://github.com/BenjaminAyivoh1
-
 ---
 
 # 🤝 Contributing
