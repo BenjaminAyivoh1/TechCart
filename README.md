@@ -303,23 +303,6 @@ http://localhost/TechCart/admin/login.php
 
 ---
 
-# 📚 Concepts Demonstrated
-
-This project demonstrates practical knowledge of:
-
-- CRUD Operations
-- Authentication
-- Session Management
-- Password Hashing
-- Relational Databases
-- Shopping Cart Logic
-- Checkout Workflow
-- Responsive Design
-- PHP & MySQL Integration
-- Bootstrap UI Development
-
----
-
 # 🚀 Future Improvements
 
 - Wishlist
@@ -339,24 +322,9 @@ This project demonstrates practical knowledge of:
 
 ---
 
-# 📈 Lessons Learned
-
-While building TechCart, I gained practical experience in:
-
-- Designing relational databases
-- Building secure authentication systems
-- Managing PHP sessions
-- Implementing CRUD functionality
-- Structuring larger PHP applications
-- Building responsive interfaces with Bootstrap
-- Debugging database-driven applications
-- Organizing reusable code using includes
-
----
-
 # 👨‍💻 Author
 
-## Benjamin Ayivoh
+# Benjamin Ayivoh
 
 University of Ghana
 
