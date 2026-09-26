@@ -358,8 +358,6 @@ While building TechCart, I gained practical experience in:
 
 ## Benjamin Ayivoh
 
-**B.Ed Information & Communication Technology**
-
 University of Ghana
 
 ---
