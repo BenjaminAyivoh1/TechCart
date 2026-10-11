@@ -1,353 +1,239 @@
 # 🛒 TechCart
 
-<p align="center">
+![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)
 
-<img src="https://img.shields.io/badge/PHP-8.x-777BB4?style=for-the-badge&logo=php">
+A responsive e-commerce web application for electronics, built with **PHP**, **MySQL** and **Bootstrap 5**. Customers can browse and search products, fill a cart, check out and track their orders. An admin panel manages products, orders and customers.
 
-<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
-
-<img src="https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap">
-
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white">
-
-<img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white">
-
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
-
-<img src="https://img.shields.io/badge/License-MIT-success?style=for-the-badge">
-
-</p>
+I built it as a portfolio project to practise the full request-to-database flow of a real shop: authentication, sessions, relational data, file uploads, and an order process that stays correct when something goes wrong. It is a **demo store** and takes no real payments.
 
 ---
 
-## 📖 Overview
+## 📸 Screenshots
 
-TechCart is a full-stack e-commerce web application built using **PHP**, **MySQL**, **Bootstrap 5**, **HTML5**, **CSS3**, and **JavaScript**.
+<!-- Make sure the file names below match the images in the /screenshots folder. -->
 
-The application enables customers to browse electronic products, manage shopping carts, create accounts, place orders, and track their purchases. It also includes a dedicated administrator panel for managing products, customer accounts, and orders.
+| Home | Shop |
+|---|---|
+| ![Home page](screenshots/home.png) | ![Shop with search and filters](screenshots/shop.png) |
 
-The project was built as a portfolio application to demonstrate practical full-stack web development concepts including authentication, CRUD operations, relational databases, session management, responsive design, and e-commerce workflows.
+| Product details | Shopping cart |
+|---|---|
+| ![Product details](screenshots/product.png) | ![Shopping cart](screenshots/cart.png) |
 
----
+| Checkout | Order history |
+|---|---|
+| ![Checkout](screenshots/checkout.png) | ![Order history](screenshots/orders.png) |
 
-# ✨ Features
-
-## 👤 Customer Features
-
-- User Registration
-- Secure Login & Logout
-- Password Hashing
-- Profile Management
-- Change Password
-- Browse Products
-- Search Products
-- Filter by Categories
-- Product Details Page
-- Shopping Cart
-- Update Cart Quantity
-- Remove Items from Cart
-- Checkout Process
-- Order Confirmation
-- Order History
-- Order Details
-- Responsive Design
+| Admin dashboard | Admin product management |
+|---|---|
+| ![Admin dashboard](screenshots/admin-dashboard.png) | ![Admin products](screenshots/admin-products.png) |
 
 ---
 
-## 🔐 Admin Features
+## ✨ Features
 
-- Secure Admin Login
-- Dashboard
-- Product Management
-- Add Products
-- Edit Products
-- Delete Products
-- User Management
-- Order Management
-- View Customer Orders
+### 👤 Customers
 
----
+- Register, log in and log out (passwords stored with `password_hash`)
+- Browse products with **search**, **category** and **stock** filters, and **sorting**
+- Product pages with stock status and related products
+- **Deals** page for discounted products
+- Session-based shopping cart with quantity controls that respect available stock
+- Checkout for guests or logged-in customers (details are prefilled when logged in)
+- Order confirmation with an order number
+- Order history and order details (customers can only see their own orders)
+- Edit profile and change password
 
-# 🛠 Tech Stack
+### 🔐 Administrators
 
-## Frontend
-
-- HTML5
-- CSS3
-- Bootstrap 5
-- Bootstrap Icons
-- JavaScript
-
-## Backend
-
-- PHP
-
-## Database
-
-- MySQL
-
-## Development Environment
-
-- XAMPP
-- phpMyAdmin
-- Visual Studio Code
+- Separate admin login
+- Dashboard with summary statistics, recent orders and charts
+- Add, edit and delete products, with an optional discount price
+- Image uploads checked for real file type and size
+- Order list with search and statistics; per-order page with status updates and a printable invoice
+- Customer list with search, and a profile page showing each customer's orders and spending
 
 ---
 
-# 📂 Project Structure
+## 🧠 Technical highlights
 
-```text
+These are the parts I spent the most time getting right.
+
+- **Placing an order is one database transaction.** Product rows are locked, stock is checked, the order and its items are saved, and stock is reduced with `UPDATE ... WHERE stock >= ?`. If anything fails, everything rolls back, so a failed checkout never leaves a half-created order, and two customers cannot buy the last item at once.
+- **Prices come from the database, never from the browser.** The total is calculated on the server at checkout, using the discount price when one is set. The price paid is stored on each order line, so later price changes do not rewrite order history.
+- **Safer admin actions.** Deleting a product is a POST request with a CSRF token. The product's image is removed only after the database row is deleted, and products that appear in past orders cannot be deleted.
+- **Upload validation.** Uploads are identified from the file's own contents (JPG, PNG or WebP only), must decode as an image, are limited to 2 MB, and are saved under a random name. An `.htaccess` file also blocks scripts from running in the images folder.
+- **Session handling.** The session ID is regenerated on login, and login errors do not reveal whether an email exists.
+- **Prepared statements** are used in the checkout, order and admin product code, and output is escaped wherever user-entered text is displayed.
+
+---
+
+## ⚠️ Known limitations
+
+I would rather list these than hide them.
+
+- **No payments.** Checkout records an order only. Paystack integration is on the roadmap.
+- **Contact and newsletter forms are visual only.** They do not send anything yet.
+- **Guest orders are not linked to an account.** They are saved without a user, so they do not appear in "My Orders".
+- **Some older read-only queries** (for example search on the shop page) still use escaped strings instead of prepared statements. Moving them over is on the roadmap.
+- **Not production-ready.** There is no rate limiting, email verification or password reset, and the cart actions and logout still use plain GET requests.
+
+---
+
+## 🛠 Tech stack
+
+| Area | Tools |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript, Bootstrap 5, Bootstrap Icons, Chart.js |
+| Backend | PHP 8.1+ (mysqli) |
+| Database | MySQL / MariaDB |
+| Environment | XAMPP, phpMyAdmin, Visual Studio Code |
+
+---
+
+## 📂 Project structure
+
+```
 TechCart/
-│
-├── admin/
+├── admin/                  Admin panel
 │   ├── add_product.php
 │   ├── delete_product.php
 │   ├── edit_product.php
-│   ├── index.php
+│   ├── index.php           Dashboard
 │   ├── login.php
 │   ├── logout.php
 │   ├── orders.php
 │   ├── products.php
 │   ├── users.php
-│   └── view_order.php
-│
+│   ├── view_order.php
+│   └── view_user.php
 ├── assets/
 │   ├── css/
-│   └── images/
-│ 
+│   └── images/             Product images (.htaccess blocks scripts here)
 ├── config/
-│   └── database.php
-│
+│   └── database.php        Database connection
 ├── database/
-│   └── techcart.sql
-│
+│   └── techcart.sql        Schema and sample data
 ├── includes/
+│   ├── functions.php       Shared helpers (escaping, pricing, image uploads)
 │   ├── header.php
 │   ├── navbar.php
 │   └── footer.php
-│
-├── about.php
-├── add_to_cart.php
-├── cart.php
-├── categories.php
-├── change_password.php
-├── checkout.php
-├── clear_cart.php
-├── contact.php
-├── deals.php
-├── faqs.php
-├── index.php
-├── login.php
-├── logout.php
-├── my_orders.php
-├── order_details.php
-├── order_success.php
-├── place_order.php
-├── privacy.php
-├── product.php
-├── profile.php
-├── register.php
-├── remove_from_cart.php
-├── returns.php
-├── shipping.php
-├── shop.php
-├── test.php
-├── update_cart.php
-├── update_profile.php
-│
-├── README.md
+├── screenshots/
+├── index.php, shop.php, product.php, categories.php, deals.php
+├── cart.php, add_to_cart.php, update_cart.php, remove_from_cart.php, clear_cart.php
+├── checkout.php, place_order.php, order_success.php
+├── register.php, login.php, logout.php, profile.php, update_profile.php, change_password.php
+├── my_orders.php, order_details.php
+├── about.php, contact.php, faqs.php, shipping.php, returns.php, privacy.php
 └── LICENSE
 ```
 
----
-
-# 📸 Screenshots
-
-Screenshots will be added soon.
-
-Recommended screenshots:
-
-- Home Page
-- Shop
-- Product Details
-- Shopping Cart
-- Checkout
-- Profile
-- Order History
-- Order Details
-- Admin Dashboard
-- Product Management
-- User Management
+**Database tables:** `users`, `admins`, `categories`, `products`, `orders`, `order_items` (plus an unused `cart` table), linked with foreign keys.
 
 ---
 
-# 🔄 Application Workflow
+## ⚙ Installation
 
-```
-Register
-      ↓
-Login
-      ↓
-Browse Products
-      ↓
-View Product Details
-      ↓
-Add to Cart
-      ↓
-Checkout
-      ↓
-Place Order
-      ↓
-View Order History
-```
+### Requirements
+
+- PHP 8.1 or newer with the `mysqli` and `fileinfo` extensions
+- MariaDB 10.4+ or MySQL 5.7+ (developed on XAMPP's MariaDB 10.4)
+- Apache 2.4 (XAMPP includes everything above)
+
+### Steps
+
+1. **Clone the repository** into your web root:
+
+   ```
+   cd xampp/htdocs
+   git clone https://github.com/BenjaminAyivoh1/TechCart.git
+   ```
+
+2. **Start Apache and MySQL** from the XAMPP control panel.
+
+3. **Create the database.** In phpMyAdmin, create an empty database named `techcart`.
+
+4. **Import the data.** Select the `techcart` database, choose **Import**, and upload `database/techcart.sql`.
+
+5. **Check the connection settings** in `config/database.php` (the XAMPP defaults are shown):
+
+   ```php
+   $host = "localhost";
+   $user = "root";
+   $password = "";
+   $database = "techcart";
+   ```
+
+6. **Open the store:** <http://localhost/TechCart>
+
+### Admin panel
+
+The admin login is at <http://localhost/TechCart/admin/login.php>, with the username `admin`.
+
+The sample database ships with a placeholder admin password that is publicly known, so **set your own before anything else**:
+
+1. Generate a hash:
+
+   ```
+   php -r "echo password_hash('YourStrongPassword', PASSWORD_DEFAULT);"
+   ```
+
+2. Save it in phpMyAdmin (SQL tab), pasting your hash in place of `PASTE_HASH_HERE`:
+
+   ```sql
+   UPDATE admins SET password = 'PASTE_HASH_HERE' WHERE username = 'admin';
+   ```
+
+Never deploy this project to a public server with the default admin password.
 
 ---
 
-# ⚙ Installation
-
-## 1. Clone the repository
-
-```bash
-git clone https://github.com/BenjaminAyivoh1/TechCart.git
-```
-
----
-
-## 2. Move the project
-
-Copy the project folder into:
+## 🔄 How an order flows
 
 ```
-xampp/htdocs/
-```
-
----
-
-## 3. Start XAMPP
-
-Launch:
-
-- Apache
-- MySQL
-
----
-
-## 4. Create Database
-
-Create a database named:
-
-```
-techcart
+Browse → Product page → Add to cart → Checkout
+      → Server re-prices the cart and checks stock
+      → Order + items saved and stock reduced (one transaction)
+      → Confirmation page → Order history
 ```
 
 ---
 
-## 5. Import Database
+## 🚀 Roadmap
 
-Import
-
-```
-database/techcart.sql
-```
-
-using phpMyAdmin.
-
----
-
-## 6. Configure Database Connection
-
-Edit:
-
-```
-config/database.php
-```
-
-Example:
-
-```php
-<?php
-
-$conn = mysqli_connect(
-    "localhost",
-    "root",
-    "",
-    "techcart"
-);
-
-if(!$conn){
-    die("Connection Failed.");
-}
-
-?>
-```
+- Paystack integration and GHS pricing
+- Prepared statements everywhere
+- Require login at checkout, or order lookup for guests
+- Password reset and email verification
+- Wishlist, product reviews and ratings
+- Image gallery per product
+- Coupons and discounts
+- Sales analytics
 
 ---
 
-## 7. Run the Project
+## 👨‍💻 Author
 
-Open:
-
-```
-http://localhost/TechCart
-```
-
----
-
-# 🔑 Admin Access
-
-Administrator Login:
-
-```
-http://localhost/TechCart/admin/login.php
-```
-
----
-
-# 🚀 Future Improvements
-
-- Wishlist
-- Product Reviews
-- Product Ratings
-- Product Image Gallery
-- Email Verification
-- Password Reset
-- Paystack Integration
-- Stripe Integration
-- Order Tracking
-- Sales Analytics
-- Coupons & Discounts
-- Inventory Notifications
-- Product Recommendations
-- Dark Mode
-
----
-
-# 👨‍💻 Author
-
-# Benjamin Ayivoh
-
+**Benjamin Ayivoh**
 University of Ghana
 
 ---
 
-# 🤝 Contributing
+## 🤝 Contributing
 
-Contributions, suggestions, and feedback are welcome.
-
-Feel free to fork the repository and submit a pull request.
+Suggestions and feedback are welcome. Feel free to fork the repository and open a pull request.
 
 ---
 
-# 📄 License
+## 📄 License
 
-This project is licensed under the MIT License.
-
-See the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-# ⭐ Support
-
-If you enjoyed this project or found it useful, please consider giving it a ⭐ on GitHub.
-
-It helps others discover the project and supports my work.
+If you found this project useful, a ⭐ on GitHub is appreciated.

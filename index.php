@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/functions.php';
 
 include 'includes/header.php';
 include 'includes/navbar.php';
@@ -416,7 +417,17 @@ htmlspecialchars($product['description']),
 
 <h3 class="text-primary fw-bold">
 
+$<?php echo number_format(effective_price($product),2); ?>
+
+<?php if (is_discounted($product)): ?>
+
+<small class="text-muted text-decoration-line-through fs-6">
+
 $<?php echo number_format($product['price'],2); ?>
+
+</small>
+
+<?php endif; ?>
 
 </h3>
 
@@ -699,4 +710,4 @@ Subscribe
 
 include 'includes/footer.php';
 
-?>
+?>

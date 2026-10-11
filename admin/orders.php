@@ -304,7 +304,7 @@ Search
 
 <td>
 
-<?php echo $order['customer_name']; ?>
+<?php echo htmlspecialchars($order['customer_name']); ?>
 
 </td>
 
@@ -348,7 +348,7 @@ $badge="danger";
 
 <span class="badge bg-<?php echo $badge; ?>">
 
-<?php echo $status; ?>
+<?php echo htmlspecialchars($status); ?>
 
 </span>
 
@@ -388,4 +388,4 @@ View
 
 </body>
 
-</html>
+</html>

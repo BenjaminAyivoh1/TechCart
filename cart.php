@@ -2,6 +2,11 @@
 session_start();
 
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/functions.php';
+
+// One-time message from add_to_cart.php / update_cart.php
+$cartNotice = $_SESSION['cart_notice'] ?? '';
+unset($_SESSION['cart_notice']);
 
 include 'includes/header.php';
 include 'includes/navbar.php';
@@ -40,6 +45,16 @@ Continue Shopping
 </a>
 
 </div>
+
+<?php if ($cartNotice !== ''): ?>
+
+<div class="alert alert-warning">
+
+<?php echo e($cartNotice); ?>
+
+</div>
+
+<?php endif; ?>
 
 <?php if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])): ?>
 
@@ -149,7 +164,9 @@ foreach ($_SESSION['cart'] as $id => $qty) {
 
     if ($product = mysqli_fetch_assoc($result)) {
 
-        $subtotal = $product['price'] * $qty;
+        $unitPrice = effective_price($product);
+
+        $subtotal = $unitPrice * $qty;
 
         $total += $subtotal;
 
@@ -193,9 +210,19 @@ Tech Product
 
 <h5 class="text-primary fw-bold">
 
-$<?php echo number_format($product['price'],2); ?>
+$<?php echo number_format($unitPrice,2); ?>
 
 </h5>
+
+<?php if (is_discounted($product)): ?>
+
+<small class="text-muted text-decoration-line-through">
+
+$<?php echo number_format($product['price'],2); ?>
+
+</small>
+
+<?php endif; ?>
 
 </td>
 
@@ -382,4 +409,4 @@ Continue Shopping
 
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

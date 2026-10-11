@@ -7,43 +7,110 @@ if (!isset($_SESSION['admin'])) {
 }
 
 require_once "../config/database.php";
+require_once "../includes/functions.php";
+
+// Make failed queries throw so we can clean up after them
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+$imageDir = __DIR__ . "/../assets/images";
+
+$error = "";
+
+$old = [
+    'product_name'   => '',
+    'description'    => '',
+    'price'          => '',
+    'discount_price' => '',
+    'stock'          => '',
+    'category_id'    => '',
+];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $category_id = (int)$_POST['category_id'];
-    $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
-    $description = mysqli_real_escape_string($conn, $_POST['description']);
-    $price = (float)$_POST['price'];
-    $stock = (int)$_POST['stock'];
+    // Keep what was typed so a mistake doesn't lose everything
+    foreach ($old as $field => $unused) {
+        $old[$field] = trim((string)($_POST[$field] ?? ''));
+    }
 
-    $image = $_FILES['image']['name'];
-    $tmp = $_FILES['image']['tmp_name'];
+    $price    = is_numeric($old['price']) ? (float)$old['price'] : -1;
+    $stock    = filter_var($old['stock'], FILTER_VALIDATE_INT);
+    $category = filter_var($old['category_id'], FILTER_VALIDATE_INT);
 
-    $imageName = time() . "_" . basename($image);
+    // Discount is optional: blank means "no discount"
+    $discount = null;
 
-    move_uploaded_file(
-        $tmp,
-        "../assets/images/" . $imageName
-    );
+    if ($old['discount_price'] !== '') {
+        $discount = is_numeric($old['discount_price']) ? (float)$old['discount_price'] : -1;
+    }
 
-    $sql = "
-        INSERT INTO products
-        (category_id, product_name, description, price, stock, image)
-        VALUES
-        (
-            '$category_id',
-            '$product_name',
-            '$description',
-            '$price',
-            '$stock',
-            '$imageName'
-        )
-    ";
+    if ($old['product_name'] === '' || mb_strlen($old['product_name']) > 150) {
+        $error = "Enter a product name (150 characters maximum).";
+    } elseif ($old['description'] === '') {
+        $error = "Enter a description.";
+    } elseif ($price < 0 || $price > 99999999.99) {
+        $error = "Enter a valid price.";
+    } elseif ($discount !== null && ($discount <= 0 || $discount >= $price)) {
+        $error = "The discount price must be more than 0 and less than the normal price, or left blank.";
+    } elseif ($stock === false || $stock < 0) {
+        $error = "Stock must be a whole number, 0 or more.";
+    } elseif ($category === false) {
+        $error = "Choose a category.";
+    } else {
 
-    mysqli_query($conn, $sql);
+        // The category must really exist
+        $check = $conn->prepare("SELECT id FROM categories WHERE id = ?");
+        $check->bind_param("i", $category);
+        $check->execute();
 
-    header("Location: products.php");
-    exit;
+        if (!$check->get_result()->fetch_assoc()) {
+            $error = "Choose a valid category.";
+        }
+    }
+
+    // Image last, so a rejected form never leaves a stray file behind
+    if ($error === "") {
+        [$imageName, $imageError] = store_product_image($_FILES['image'] ?? [], $imageDir);
+
+        if ($imageError !== null) {
+            $error = $imageError;
+        }
+    }
+
+    if ($error === "") {
+
+        try {
+
+            $stmt = $conn->prepare(
+                "INSERT INTO products
+                    (category_id, product_name, description, price, discount_price, stock, image)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)"
+            );
+
+            $stmt->bind_param(
+                "issddis",
+                $category,
+                $old['product_name'],
+                $old['description'],
+                $price,
+                $discount,
+                $stock,
+                $imageName
+            );
+
+            $stmt->execute();
+
+            header("Location: products.php");
+            exit;
+
+        } catch (mysqli_sql_exception $e) {
+
+            // The product was not saved, so don't keep its image either
+            delete_product_image($imageName, $imageDir);
+
+            error_log("TechCart add_product failed: " . $e->getMessage());
+            $error = "Could not save the product. Please try again.";
+        }
+    }
 }
 
 // Load categories
@@ -162,6 +229,16 @@ Add New Product
 
 <div class="card-body">
 
+<?php if ($error !== ""): ?>
+
+<div class="alert alert-danger">
+
+<?php echo e($error); ?>
+
+</div>
+
+<?php endif; ?>
+
 <form
 method="POST"
 enctype="multipart/form-data">
@@ -175,7 +252,9 @@ Product Name
 <input
 type="text"
 name="product_name"
+maxlength="150"
 class="form-control"
+value="<?php echo e($old['product_name']); ?>"
 required>
 
 </div>
@@ -190,13 +269,13 @@ Description
 name="description"
 rows="4"
 class="form-control"
-required></textarea>
+required><?php echo e($old['description']); ?></textarea>
 
 </div>
 
 <div class="row">
 
-<div class="col-md-6">
+<div class="col-md-4">
 
 <label class="form-label">
 Price
@@ -205,13 +284,31 @@ Price
 <input
 type="number"
 step="0.01"
+min="0"
 name="price"
 class="form-control"
+value="<?php echo e($old['price']); ?>"
 required>
 
 </div>
 
-<div class="col-md-6">
+<div class="col-md-4">
+
+<label class="form-label">
+Discount Price (optional)
+</label>
+
+<input
+type="number"
+step="0.01"
+min="0"
+name="discount_price"
+class="form-control"
+value="<?php echo e($old['discount_price']); ?>">
+
+</div>
+
+<div class="col-md-4">
 
 <label class="form-label">
 Stock
@@ -219,8 +316,10 @@ Stock
 
 <input
 type="number"
+min="0"
 name="stock"
 class="form-control"
+value="<?php echo e($old['stock']); ?>"
 required>
 
 </div>
@@ -244,9 +343,11 @@ Select Category
 
 <?php while($category = mysqli_fetch_assoc($categories)){ ?>
 
-<option value="<?php echo $category['id']; ?>">
+<option
+value="<?php echo (int)$category['id']; ?>"
+<?php if ((string)$category['id'] === $old['category_id']) echo "selected"; ?>>
 
-<?php echo $category['category_name']; ?>
+<?php echo e($category['category_name']); ?>
 
 </option>
 
@@ -259,14 +360,14 @@ Select Category
 <div class="mt-3">
 
 <label class="form-label">
-Product Image
+Product Image (JPG, PNG or WebP, max 2 MB)
 </label>
 
 <input
 type="file"
 name="image"
 class="form-control"
-accept="image/*"
+accept="image/jpeg,image/png,image/webp"
 required>
 
 </div>

@@ -27,6 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         if (password_verify($password, $user['password'])) {
 
+            // New session ID after login prevents session fixation
+            session_regenerate_id(true);
+
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['full_name'];
             $_SESSION['user_email'] = $user['email'];
@@ -36,13 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         } else {
 
-            $error = "Incorrect password.";
+            // Same message as "no such account" so emails can't be probed
+            $error = "Incorrect email or password.";
 
         }
 
     } else {
 
-        $error = "No account found with that email.";
+        $error = "Incorrect email or password.";
 
     }
 
@@ -219,4 +223,4 @@ function togglePassword(id, button){
 
 </script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

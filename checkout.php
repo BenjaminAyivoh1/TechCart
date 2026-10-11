@@ -2,16 +2,38 @@
 session_start();
 
 require_once 'config/database.php';
+require_once 'includes/functions.php';
 
-include 'includes/header.php';
-include 'includes/navbar.php';
-
+// Redirect BEFORE any HTML is sent, otherwise header() cannot work
 if (empty($_SESSION['cart'])) {
     header("Location: cart.php");
     exit;
 }
 
+// Error message left by place_order.php (shown once)
+$checkoutError = $_SESSION['checkout_error'] ?? '';
+unset($_SESSION['checkout_error']);
+
+// Prefill the form for logged-in customers
+$prefill = ['full_name' => '', 'email' => '', 'phone' => '', 'address' => ''];
+
+if (isset($_SESSION['user_id'])) {
+
+    $userId = (int)$_SESSION['user_id'];
+
+    $stmt = $conn->prepare("SELECT full_name, email, phone, address FROM users WHERE id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+
+    if ($row = $stmt->get_result()->fetch_assoc()) {
+        $prefill = array_map(fn($v) => (string)$v, $row);
+    }
+}
+
 $total = 0;
+
+include 'includes/header.php';
+include 'includes/navbar.php';
 ?>
 
 <div class="container py-5">
@@ -30,7 +52,7 @@ Checkout
 
 <p class="text-muted mb-0">
 
-Complete your order securely.
+Enter your delivery details to complete the order.
 
 </p>
 
@@ -47,6 +69,20 @@ Back To Cart
 </a>
 
 </div>
+
+<?php if ($checkoutError !== ''): ?>
+
+<div class="alert alert-danger">
+
+<i class="bi bi-exclamation-triangle-fill"></i>
+
+<?php echo e($checkoutError); ?>
+
+</div>
+
+<?php endif; ?>
+
+<form action="place_order.php" method="POST">
 
 <div class="row g-4">
 
@@ -75,8 +111,6 @@ Back To Cart
 
                 <div class="card-body p-4">
 
-                    <form action="place_order.php" method="POST">
-
                         <div class="mb-3">
 
                             <label class="form-label">Full Name</label>
@@ -84,8 +118,10 @@ Back To Cart
                             <input
                             type="text"
                             name="name"
+                            maxlength="100"
                             class="form-control form-control-lg rounded-pill"
                             placeholder="John Doe"
+                            value="<?php echo e($prefill['full_name']); ?>"
                             required>
                         </div>
 
@@ -96,8 +132,10 @@ Back To Cart
                             <input
                             type="email"
                             name="email"
+                            maxlength="100"
                             class="form-control form-control-lg rounded-pill"
                             placeholder="john@email.com"
+                            value="<?php echo e($prefill['email']); ?>"
                             required>
                         </div>
 
@@ -105,12 +143,14 @@ Back To Cart
 
                             <label class="form-label">Phone</label>
 
-                        <input
-                        type="text"
-                        name="phone"
-                        class="form-control form-control-lg rounded-pill"
-                        placeholder="+233 XX XXX XXXX"
-                        required>
+                            <input
+                            type="text"
+                            name="phone"
+                            maxlength="20"
+                            class="form-control form-control-lg rounded-pill"
+                            placeholder="+233 XX XXX XXXX"
+                            value="<?php echo e($prefill['phone']); ?>"
+                            required>
                         </div>
 
                         <div class="mb-3">
@@ -122,7 +162,7 @@ Back To Cart
                                 rows="5"
                                 class="form-control rounded-4"
                                 placeholder="House number, street, city..."
-                                required></textarea>
+                                required><?php echo e($prefill['address']); ?></textarea>
                         </div>
 
                 </div>
@@ -152,19 +192,18 @@ Back To Cart
 
                     <?php
 
+                    $lookup = $conn->prepare("SELECT * FROM products WHERE id = ?");
+
                     foreach ($_SESSION['cart'] as $id => $qty) {
-                        echo "<pre>";
-                            print_r($_SESSION['cart']);
-                            echo "</pre>";
 
                         $id = (int)$id;
 
-                        $query = "SELECT * FROM products WHERE id = $id";
-                        $result = mysqli_query($conn, $query);
+                        $lookup->bind_param("i", $id);
+                        $lookup->execute();
 
-                        if ($product = mysqli_fetch_assoc($result)) {
+                        if ($product = $lookup->get_result()->fetch_assoc()) {
 
-                            $subtotal = $product['price'] * $qty;
+                            $subtotal = effective_price($product) * $qty;
                             $total += $subtotal;
 
                     ?>
@@ -172,21 +211,22 @@ Back To Cart
                             <div class="d-flex align-items-center mb-4">
 
                                 <img
-                                src="assets/images/<?php echo htmlspecialchars($product['image']); ?>"
+                                src="assets/images/<?php echo e($product['image']); ?>"
                                 class="rounded"
-                                style="width:65px;height:65px;object-fit:cover;">
+                                style="width:65px;height:65px;object-fit:cover;"
+                                alt="<?php echo e($product['product_name']); ?>">
 
                                 <div class="ms-3 flex-grow-1">
 
                                 <h6 class="fw-bold mb-1">
 
-                                <?php echo htmlspecialchars($product['product_name']); ?>
+                                <?php echo e($product['product_name']); ?>
 
                                 </h6>
 
                                 <small class="text-muted">
 
-                                Qty: <?php echo $qty; ?>
+                                Qty: <?php echo (int)$qty; ?>
 
                                 </small>
 
@@ -223,9 +263,9 @@ Back To Cart
 
                             </strong>
 
-                            </div>
+                        </div>
 
-                            <div class="d-flex justify-content-between mb-3">
+                        <div class="d-flex justify-content-between mb-3">
 
                             <span>
 
@@ -239,11 +279,11 @@ Back To Cart
 
                             </span>
 
-                            </div>
+                        </div>
 
-                            <hr>
+                        <hr>
 
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
 
                             <h3>
 
@@ -256,14 +296,19 @@ Back To Cart
                             $<?php echo number_format($total,2); ?>
 
                             </h3>
+
                         </div>
 
                     <button
                     type="submit"
                     class="btn btn-success btn-lg w-100 rounded-pill">
-                    <i class="bi bi-lock-fill"></i>
-                    Place Secure Order
+                    <i class="bi bi-bag-check"></i>
+                    Place Order
                     </button>
+
+                    <p class="text-muted small text-center mt-3 mb-0">
+                    Demo store: no payment is taken.
+                    </p>
 
                 </div>
 
@@ -273,7 +318,7 @@ Back To Cart
 
     </div>
 
-    </form>
+</form>
 
 </div>
 

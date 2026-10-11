@@ -68,7 +68,7 @@ FROM products
 LEFT JOIN categories
 ON products.category_id=categories.id
 WHERE
-products.category_id=".$product['category_id']."
+products.category_id=".(int)$product['category_id']."
 AND
 products.id!=".$productID."
 LIMIT 4

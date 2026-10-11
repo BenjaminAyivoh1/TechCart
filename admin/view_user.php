@@ -560,7 +560,7 @@ Order History
                 break;
 
             default:
-                echo "<span class='badge bg-secondary'>".$order['order_status']."</span>";
+                echo "<span class='badge bg-secondary'>".htmlspecialchars($order['order_status'])."</span>";
         }
 
         ?>
@@ -631,4 +631,4 @@ This customer hasn't placed any orders yet.
 
 </body>
 
-</html>
+</html>

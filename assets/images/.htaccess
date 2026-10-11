@@ -1,0 +1,6 @@
+# Product images only. Never run scripts from this folder,
+# even if a file with a script extension somehow ends up here.
+# (Needs Apache 2.4; XAMPP's default config allows this.)
+<FilesMatch "(?i)\.(php[0-9]?|phtml|phar|phps|cgi|pl|py|sh)$">
+    Require all denied
+</FilesMatch>

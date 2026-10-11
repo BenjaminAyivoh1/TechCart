@@ -159,7 +159,7 @@ Logout
 
 <h1 class="mb-4">
 Welcome,
-<?php echo $_SESSION['admin']; ?> 👋
+<?php echo htmlspecialchars($_SESSION['admin']); ?> 👋
 </h1>
 
 <div class="row g-4">
@@ -317,7 +317,7 @@ Welcome,
 
                     <td>#<?php echo $order['id']; ?></td>
 
-                    <td><?php echo $order['customer_name']; ?></td>
+                    <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
 
                     <td>$<?php echo number_format($order['total'],2); ?></td>
 
@@ -344,7 +344,7 @@ Welcome,
                         ?>
 
                         <span class="badge bg-<?php echo $badge; ?>">
-                            <?php echo $status; ?>
+                            <?php echo htmlspecialchars($status); ?>
                         </span>
 
                     </td>
@@ -485,4 +485,4 @@ new Chart(overviewCtx, {
 </script>
 </body>
 
-</html>
+</html>

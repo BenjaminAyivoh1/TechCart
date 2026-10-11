@@ -31,10 +31,17 @@ $success = "";
 
 if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['status'])) {
 
-    $status = mysqli_real_escape_string(
-        $conn,
-        trim($_POST['status'])
-    );
+    // Only the five known statuses are accepted
+    $allowedStatuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
+
+    $status = trim($_POST['status']);
+
+    if (!in_array($status, $allowedStatuses, true)) {
+        header("Location: view_order.php?id=" . $id);
+        exit;
+    }
+
+    $status = mysqli_real_escape_string($conn, $status);
 
     mysqli_query(
         $conn,
@@ -452,7 +459,7 @@ $<?php echo number_format($order['total'],2); ?>
 
 <h5>
 
-<?php echo $order['order_status']; ?>
+<?php echo htmlspecialchars($order['order_status']); ?>
 
 </h5>
 
@@ -572,7 +579,7 @@ $<?php echo number_format($order['total'],2); ?>
 
 <i class="bi bi-<?php echo $statusIcon; ?>"></i>
 
-<?php echo $order['order_status']; ?>
+<?php echo htmlspecialchars($order['order_status']); ?>
 
 </span>
 
@@ -704,7 +711,7 @@ $image = "../assets/images/".$item['image'];
 <?php if(!empty($item['image']) && file_exists($image)){ ?>
 
 <img
-src="<?php echo $image; ?>"
+src="<?php echo htmlspecialchars($image); ?>"
 width="80"
 height="80"
 style="object-fit:cover;border-radius:12px;">
@@ -835,7 +842,7 @@ Order Summary
 
 <span class="badge bg-<?php echo explode(' ',$statusClass)[0]; ?>">
 
-<?php echo $order['order_status']; ?>
+<?php echo htmlspecialchars($order['order_status']); ?>
 
 </span>
 
@@ -873,4 +880,4 @@ $<?php echo number_format($grandTotal,2); ?>
 
 </body>
 
-</html>
+</html>
