@@ -14,6 +14,15 @@ require_once "../config/database.php";
 |--------------------------------------------------------------------------
 */
 
+// CSRF token for the delete buttons
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(32));
+}
+
+// One-time message from delete_product.php
+$adminError = $_SESSION['admin_error'] ?? '';
+unset($_SESSION['admin_error']);
+
 $search = "";
 $categoryFilter = "";
 $statusFilter = "";
@@ -358,6 +367,16 @@ Logout
 
 <div class="main">
 
+<?php if ($adminError !== ''): ?>
+
+<div class="alert alert-danger">
+
+<?php echo htmlspecialchars($adminError); ?>
+
+</div>
+
+<?php endif; ?>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
 
 <div>
@@ -585,10 +604,10 @@ while($category = mysqli_fetch_assoc($categories)){
 ?>
 
 <option
-value="<?php echo $category['category_name']; ?>"
+value="<?php echo htmlspecialchars($category['category_name']); ?>"
 <?php if($categoryFilter == $category['category_name']) echo "selected"; ?>>
 
-<?php echo $category['category_name']; ?>
+<?php echo htmlspecialchars($category['category_name']); ?>
 
 </option>
 
@@ -784,7 +803,7 @@ if(
 ?>
 
 <img
-src="<?php echo $image; ?>"
+src="<?php echo htmlspecialchars($image); ?>"
 width="80"
 height="80">
 
@@ -891,15 +910,26 @@ title="Edit">
 
 </a>
 
-<a
-href="delete_product.php?id=<?php echo $product['id']; ?>"
+<form
+method="POST"
+action="delete_product.php"
+class="d-inline"
+onsubmit="return confirm('Delete this product permanently?')">
+
+<input type="hidden" name="id" value="<?php echo (int)$product['id']; ?>">
+
+<input type="hidden" name="csrf" value="<?php echo $_SESSION['csrf']; ?>">
+
+<button
+type="submit"
 class="btn btn-outline-danger btn-sm"
-onclick="return confirm('Delete this product permanently?')"
 title="Delete">
 
 <i class="bi bi-trash"></i>
 
-</a>
+</button>
+
+</form>
 
 </div>
 
@@ -973,4 +1003,4 @@ Add Product
 
 </body>
 
-</html>
+</html>

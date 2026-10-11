@@ -24,6 +24,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $admin['password'])) {
 
+            // New session ID after login prevents session fixation
+            session_regenerate_id(true);
+
             $_SESSION['admin'] = $admin['username'];
 
             header("Location: index.php");
@@ -31,13 +34,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         } else {
 
-            $error = "Incorrect password.";
+            $error = "Incorrect username or password.";
 
         }
 
     } else {
 
-        $error = "Admin account not found.";
+        $error = "Incorrect username or password.";
 
     }
 
@@ -170,4 +173,4 @@ Login
 
 </body>
 
-</html>
+</html>

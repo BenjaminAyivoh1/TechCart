@@ -1,14 +1,18 @@
 <?php
 session_start();
 require_once "config/database.php";
+require_once "includes/functions.php";
 
+// Only real deals: a discount above 0 and below the normal price
 $deals = mysqli_query($conn, "
 SELECT products.*, categories.category_name
 FROM products
 LEFT JOIN categories
 ON products.category_id = categories.id
-WHERE discount_price IS NOT NULL
-ORDER BY discount_price ASC
+WHERE products.discount_price IS NOT NULL
+AND products.discount_price > 0
+AND products.discount_price < products.price
+ORDER BY products.discount_price ASC
 ");
 ?>
 
@@ -55,9 +59,10 @@ $product['price']) * 100
 <div class="position-relative">
 
 <img
-src="assets/images/<?php echo $product['image']; ?>"
+src="assets/images/<?php echo e($product['image']); ?>"
 class="card-img-top"
-style="height:250px;object-fit:cover;">
+style="height:250px;object-fit:cover;"
+alt="<?php echo e($product['product_name']); ?>">
 
 <span
 class="badge bg-danger position-absolute top-0 end-0 m-2">
@@ -72,19 +77,19 @@ class="badge bg-danger position-absolute top-0 end-0 m-2">
 
 <span class="badge bg-primary mb-2">
 
-<?php echo $product['category_name']; ?>
+<?php echo e($product['category_name']); ?>
 
 </span>
 
 <h5 class="fw-bold">
 
-<?php echo $product['product_name']; ?>
+<?php echo e($product['product_name']); ?>
 
 </h5>
 
 <p class="text-muted">
 
-<?php echo substr($product['description'],0,70); ?>...
+<?php echo e(mb_substr($product['description'],0,70)); ?>...
 
 </p>
 
@@ -127,4 +132,4 @@ View Deal
 
 </section>
 
-<?php include "includes/footer.php"; ?>
+<?php include "includes/footer.php"; ?>

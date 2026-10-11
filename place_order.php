@@ -2,169 +2,206 @@
 session_start();
 
 require_once 'config/database.php';
+require_once 'includes/functions.php';
 
-// Redirect if cart is empty
+// Make every mysqli failure throw, so the transaction below can roll back.
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+/**
+ * A problem the customer can understand and fix (out of stock, etc).
+ * Separate from mysqli_sql_exception, which extends RuntimeException,
+ * so database errors are never shown to the customer.
+ */
+class OrderException extends Exception
+{
+}
+
+/**
+ * Send the customer back to checkout with a message.
+ */
+function checkout_fail(string $message): void
+{
+    $_SESSION['checkout_error'] = $message;
+    header("Location: checkout.php");
+    exit;
+}
+
+// Only accept the checkout form
+if ($_SERVER['REQUEST_METHOD'] !== "POST") {
+    header("Location: checkout.php");
+    exit;
+}
+
+// Nothing to order
 if (empty($_SESSION['cart'])) {
     header("Location: cart.php");
     exit;
 }
 
-// Process only when form is submitted
-if ($_SERVER['REQUEST_METHOD'] == "POST") {
+/*
+|--------------------------------------------------------------------------
+| Validate customer details
+|--------------------------------------------------------------------------
+*/
 
-    // Customer Information
-    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $address = mysqli_real_escape_string($conn, trim($_POST['address']));
+$name    = trim($_POST['name'] ?? '');
+$email   = trim($_POST['email'] ?? '');
+$phone   = trim($_POST['phone'] ?? '');
+$address = trim($_POST['address'] ?? '');
 
-    // Calculate Order Total
-    $total = 0;
-
-    foreach ($_SESSION['cart'] as $id => $qty) {
-
-        $id = (int)$id;
-
-        $result = mysqli_query($conn, "SELECT price FROM products WHERE id = $id");
-
-        if ($product = mysqli_fetch_assoc($result)) {
-
-            $total += $product['price'] * $qty;
-
-        }
-    }
-
-    // Check if user already exists
-    $userQuery = mysqli_query(
-        $conn,
-        "SELECT id FROM users WHERE email = '$email'"
-    );
-
-    if (mysqli_num_rows($userQuery) > 0) {
-
-    // Existing user
-    $user = mysqli_fetch_assoc($userQuery);
-    $user_id = $user['id'];
-
-    } else {
-
-    // Create new user
-    $insertUser = mysqli_query(
-        $conn,
-        "INSERT INTO users
-        (
-            full_name,
-            email,
-            password,
-            phone,
-            address
-        )
-        VALUES
-        (
-            '$name',
-            '$email',
-            '',
-            '$phone',
-            '$address'
-        )"
-    );
-
-    if (!$insertUser) {
-        die("User Insert Error: " . mysqli_error($conn));
-    }
-
-    $user_id = mysqli_insert_id($conn);
-}
-    // Save Order
-    $query = "
-        INSERT INTO orders
-        (
-            user_id,
-            customer_name,
-            email,
-            phone,
-            address,
-            total,
-            order_status
-        )
-        VALUES
-        (
-            '$user_id',
-            '$name',
-            '$email',
-            '$phone',
-            '$address',
-            '$total',
-            'Pending'
-        )
-    ";
-
-    if (!mysqli_query($conn, $query)) {
-        die("Order Error: " . mysqli_error($conn));
-    }
-
-    // Get Order ID
-    $order_id = mysqli_insert_id($conn);
-
-    // Save Order Items & Update Stock
-foreach ($_SESSION['cart'] as $id => $qty) {
-
-    $id = (int)$id;
-
-    $result = mysqli_query(
-        $conn,
-        "SELECT price, stock
-        FROM products
-        WHERE id = $id"
-    );
-
-    if ($product = mysqli_fetch_assoc($result)) {
-
-        // Prevent ordering more than available stock
-        if ($qty > $product['stock']) {
-
-            die("Error: Not enough stock available for this product.");
-
-        }
-
-        $price = $product['price'];
-
-        // Save order item
-        if (!mysqli_query(
-            $conn,
-            "INSERT INTO order_items
-            (order_id, product_id, quantity, price)
-            VALUES
-            ($order_id, $id, $qty, $price)"
-        )) {
-            die("Order Item Error: " . mysqli_error($conn));
-        }
-
-        // Reduce stock
-        if (!mysqli_query(
-            $conn,
-            "UPDATE products
-            SET stock = stock - $qty
-            WHERE id = $id"
-        )) {
-            die("Stock Update Error: " . mysqli_error($conn));
-        }
-
-    }
-
+if ($name === '' || $email === '' || $phone === '' || $address === '') {
+    checkout_fail("Please fill in all the fields.");
 }
 
-    // Empty Cart
+if (mb_strlen($name) > 100) {
+    checkout_fail("Name is too long (100 characters maximum).");
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 100) {
+    checkout_fail("Please enter a valid email address.");
+}
+
+if (mb_strlen($phone) > 20) {
+    checkout_fail("Phone number is too long (20 characters maximum).");
+}
+
+/*
+|--------------------------------------------------------------------------
+| Clean the cart: positive integer quantities only
+|--------------------------------------------------------------------------
+*/
+
+$items = [];
+
+foreach ($_SESSION['cart'] as $productId => $qty) {
+
+    $productId = (int)$productId;
+    $qty       = (int)$qty;
+
+    if ($productId > 0 && $qty > 0) {
+        $items[$productId] = $qty;
+    }
+}
+
+if (empty($items)) {
     unset($_SESSION['cart']);
-
-    // Redirect
-    header("Location: order_success.php");
+    header("Location: cart.php");
     exit;
-
-} else {
-
-    header("Location: checkout.php");
-    exit;
-
 }
-?>
+
+// Lock rows in a consistent order so two checkouts cannot deadlock
+ksort($items);
+
+// Logged-in customers order as themselves; guests get user_id NULL.
+// (We never attach an order to an account just because the email matches.)
+$userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+
+/*
+|--------------------------------------------------------------------------
+| Place the order inside one transaction
+|--------------------------------------------------------------------------
+*/
+
+try {
+
+    $conn->begin_transaction();
+
+    // 1. Lock and validate every product, price it from the database
+    $select = $conn->prepare(
+        "SELECT id, product_name, price, discount_price, stock
+         FROM products
+         WHERE id = ?
+         FOR UPDATE"
+    );
+
+    $lines = [];
+    $total = 0.0;
+
+    foreach ($items as $productId => $qty) {
+
+        $select->bind_param("i", $productId);
+        $select->execute();
+        $product = $select->get_result()->fetch_assoc();
+
+        if (!$product) {
+            throw new OrderException("An item in your cart is no longer available.");
+        }
+
+        if ($qty > (int)$product['stock']) {
+            throw new OrderException(
+                "Sorry, only " . (int)$product['stock'] . " of \"" . $product['product_name'] . "\" left in stock."
+            );
+        }
+
+        $unitPrice = effective_price($product);
+
+        $lines[] = [
+            'product_id' => $productId,
+            'qty'        => $qty,
+            'price'      => $unitPrice,
+        ];
+
+        $total += $unitPrice * $qty;
+    }
+
+    $total = round($total, 2);
+
+    // 2. Create the order
+    $insertOrder = $conn->prepare(
+        "INSERT INTO orders
+            (user_id, customer_name, email, phone, address, total, order_status)
+         VALUES (?, ?, ?, ?, ?, ?, 'Pending')"
+    );
+
+    $insertOrder->bind_param("issssd", $userId, $name, $email, $phone, $address, $total);
+    $insertOrder->execute();
+
+    $orderId = $conn->insert_id;
+
+    // 3. Save the items and take the stock
+    $insertItem = $conn->prepare(
+        "INSERT INTO order_items (order_id, product_id, quantity, price)
+         VALUES (?, ?, ?, ?)"
+    );
+
+    $reduceStock = $conn->prepare(
+        "UPDATE products
+         SET stock = stock - ?
+         WHERE id = ? AND stock >= ?"
+    );
+
+    foreach ($lines as $line) {
+
+        $insertItem->bind_param("iiid", $orderId, $line['product_id'], $line['qty'], $line['price']);
+        $insertItem->execute();
+
+        $reduceStock->bind_param("iii", $line['qty'], $line['product_id'], $line['qty']);
+        $reduceStock->execute();
+
+        if ($reduceStock->affected_rows !== 1) {
+            throw new OrderException("Stock changed while you were checking out. Please review your cart.");
+        }
+    }
+
+    $conn->commit();
+
+} catch (OrderException $e) {
+
+    // A problem the customer can understand and fix
+    $conn->rollback();
+    checkout_fail($e->getMessage());
+
+} catch (Throwable $e) {
+
+    // Anything else: log the detail, show a generic message
+    $conn->rollback();
+    error_log("TechCart place_order failed: " . $e->getMessage());
+    checkout_fail("Something went wrong while placing your order. Please try again.");
+}
+
+// Success: empty the cart and show the confirmation page
+unset($_SESSION['cart']);
+$_SESSION['last_order_id'] = $orderId;
+
+header("Location: order_success.php");
+exit;
