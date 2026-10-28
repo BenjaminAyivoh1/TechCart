@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$pageTitle = 'Shipping Information';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>

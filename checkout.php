@@ -32,6 +32,8 @@ if (isset($_SESSION['user_id'])) {
 
 $total = 0;
 
+$pageTitle = 'Checkout';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>

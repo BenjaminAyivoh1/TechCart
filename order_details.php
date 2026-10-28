@@ -30,6 +30,8 @@ if (mysqli_num_rows($orderQuery) == 0) {
 
 $order = mysqli_fetch_assoc($orderQuery);
 
+$pageTitle = 'Order Details';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>

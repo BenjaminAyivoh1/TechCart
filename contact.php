@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$pageTitle = 'Contact Us';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>

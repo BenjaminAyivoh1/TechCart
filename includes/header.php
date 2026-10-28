@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TechCart | Modern Electronics Store</title>
+    <title><?php echo htmlspecialchars(isset($pageTitle) ? $pageTitle . ' | TechCart' : 'TechCart | Modern Electronics Store'); ?></title>
 
     <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +22,8 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
+
+    <?php echo $extraHead ?? ''; ?>
 
 </head>
 

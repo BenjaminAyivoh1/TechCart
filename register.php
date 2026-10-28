@@ -76,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 }
 
+$pageTitle = 'Create Account';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>

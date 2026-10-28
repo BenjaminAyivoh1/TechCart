@@ -52,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 }
 
+$pageTitle = 'Login';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>
