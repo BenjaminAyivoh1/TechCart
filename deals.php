@@ -16,7 +16,7 @@ ORDER BY products.discount_price ASC
 ");
 ?>
 
-<?php include "includes/header.php"; ?>
+<?php $pageTitle = 'Deals'; include "includes/header.php"; ?>
 <?php include "includes/navbar.php"; ?>
 
 <section class="py-5 bg-light">

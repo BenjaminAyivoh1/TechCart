@@ -19,6 +19,8 @@ $query = mysqli_query(
     ORDER BY id DESC"
 );
 
+$pageTitle = 'My Orders';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>

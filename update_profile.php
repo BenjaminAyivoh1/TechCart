@@ -8,28 +8,22 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int)$_SESSION['user_id'];
 
-$full_name = mysqli_real_escape_string($conn, trim($_POST['full_name']));
-$phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-$address = mysqli_real_escape_string($conn, trim($_POST['address']));
+$full_name = trim($_POST['full_name'] ?? '');
+$phone     = trim($_POST['phone'] ?? '');
+$address   = trim($_POST['address'] ?? '');
 
-$query = "
-UPDATE users
-SET
-full_name='$full_name',
-phone='$phone',
-address='$address'
-WHERE id=$user_id
-";
+// A blank name or an over-long value is ignored rather than saved
+if ($full_name !== '' && mb_strlen($full_name) <= 100 && mb_strlen($phone) <= 20) {
 
-if(mysqli_query($conn,$query)){
+    $stmt = $conn->prepare("UPDATE users SET full_name = ?, phone = ?, address = ? WHERE id = ?");
+    $stmt->bind_param("sssi", $full_name, $phone, $address, $user_id);
+    $stmt->execute();
 
+    // The plain name, not an SQL-escaped copy (which would show stray backslashes)
     $_SESSION['user_name'] = $full_name;
-
 }
 
 header("Location: profile.php");
-
 exit;
-?>

@@ -3,9 +3,6 @@ session_start();
 
 require_once __DIR__ . "/config/database.php";
 
-include "includes/header.php";
-include "includes/navbar.php";
-
 /*
 |--------------------------------------------------------------------------
 | Validate Product ID
@@ -74,33 +71,10 @@ products.id!=".$productID."
 LIMIT 4
 "
 );
+$pageTitle = $product['product_name'];
+
+ob_start();
 ?>
-
-<!DOCTYPE html>
-
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1">
-
-<title>
-
-<?php echo htmlspecialchars($product['product_name']); ?>
-
-</title>
-
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
-rel="stylesheet">
-
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css"
-rel="stylesheet">
 
 <style>
 
@@ -176,9 +150,12 @@ box-shadow:0 15px 30px rgba(0,0,0,.12);
 
 </style>
 
-</head>
+<?php
+$extraHead = ob_get_clean();
 
-<body>
+include "includes/header.php";
+include "includes/navbar.php";
+?>
 
 <div class="container py-5">
 
@@ -692,9 +669,3 @@ Friendly customer support whenever you need help.
 include "includes/footer.php";
 
 ?>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-</html>

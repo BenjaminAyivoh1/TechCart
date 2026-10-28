@@ -8,6 +8,8 @@ require_once 'includes/functions.php';
 $orderId = (int)($_SESSION['last_order_id'] ?? 0);
 unset($_SESSION['last_order_id']);
 
+$pageTitle = 'Order Confirmed';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 

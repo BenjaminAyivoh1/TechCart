@@ -8,6 +8,8 @@ require_once __DIR__ . '/includes/functions.php';
 $cartNotice = $_SESSION['cart_notice'] ?? '';
 unset($_SESSION['cart_notice']);
 
+$pageTitle = 'Shopping Cart';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>

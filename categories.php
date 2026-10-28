@@ -3,6 +3,8 @@ session_start();
 
 require_once "config/database.php";
 
+$pageTitle = 'Categories';
+
 include "includes/header.php";
 include "includes/navbar.php";
 

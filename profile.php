@@ -17,6 +17,8 @@ $query = mysqli_query(
 
 $user = mysqli_fetch_assoc($query);
 
+$pageTitle = 'My Profile';
+
 include 'includes/header.php';
 include 'includes/navbar.php';
 ?>
