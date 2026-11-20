@@ -2,78 +2,79 @@
 session_start();
 
 require_once 'config/database.php';
+require_once 'includes/functions.php';
 
 $error = "";
 $success = "";
 
+$full_name = "";
+$email = "";
+$phone = "";
+$address = "";
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
-    $full_name = mysqli_real_escape_string($conn, trim($_POST['full_name']));
-    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $address = mysqli_real_escape_string($conn, trim($_POST['address']));
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+    $full_name = trim($_POST['full_name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $address = trim($_POST['address'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
-    // Check if passwords match
-    if ($password != $confirm_password) {
+    if ($full_name === '' || mb_strlen($full_name) > 100) {
+
+        $error = "Please enter your name (100 characters maximum).";
+
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 100) {
+
+        $error = "Please enter a valid email address.";
+
+    } elseif (mb_strlen($phone) > 20) {
+
+        $error = "Phone number is too long (20 characters maximum).";
+
+    } elseif (strlen($password) < 8) {
+
+        $error = "Password must be at least 8 characters.";
+
+    } elseif ($password !== $confirm_password) {
 
         $error = "Passwords do not match.";
 
     } else {
 
-        // Check if email already exists
-        $check = mysqli_query(
-            $conn,
-            "SELECT id FROM users WHERE email='$email'"
-        );
+        try {
 
-        if (mysqli_num_rows($check) > 0) {
+            $check = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $check->bind_param("s", $email);
+            $check->execute();
 
-            $error = "An account with this email already exists.";
+            if ($check->get_result()->fetch_assoc()) {
 
-        } else {
+                $error = "An account with this email already exists.";
 
-            // Hash password
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            } else {
 
-            // Insert user
-            $query = "
-                INSERT INTO users
-                (
-                    full_name,
-                    email,
-                    password,
-                    phone,
-                    address
-                )
-                VALUES
-                (
-                    '$full_name',
-                    '$email',
-                    '$hashedPassword',
-                    '$phone',
-                    '$address'
-                )
-            ";
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            if (mysqli_query($conn, $query)) {
+                $insert = $conn->prepare(
+                    "INSERT INTO users (full_name, email, password, phone, address) VALUES (?, ?, ?, ?, ?)"
+                );
+                $insert->bind_param("sssss", $full_name, $email, $hashedPassword, $phone, $address);
+                $insert->execute();
 
                 $_SESSION['success'] = "Registration successful! Please log in.";
 
                 header("Location: login.php");
                 exit;
-
-            } else {
-
-                $error = "Registration failed: " . mysqli_error($conn);
-
             }
 
+        } catch (Throwable $e) {
+
+            error_log("TechCart register failed: " . $e->getMessage());
+            $error = "Registration failed. Please try again.";
         }
-
     }
-
 }
 
 $pageTitle = 'Create Account';
@@ -120,11 +121,11 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label for="f-register-full-name" class="form-label">
                                 Full Name
                             </label>
 
-                            <input
+                            <input value="<?php echo e($full_name); ?>" autocomplete="name" id="f-register-full-name"
                                 type="text"
                                 name="full_name"
                                 class="form-control form-control-lg"
@@ -134,11 +135,11 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label for="f-register-email" class="form-label">
                                 Email Address
                             </label>
 
-                            <input
+                            <input value="<?php echo e($email); ?>" autocomplete="email" id="f-register-email"
                                 type="email"
                                 name="email"
                                 class="form-control form-control-lg"
@@ -148,12 +149,12 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label for="f-register-phone" class="form-label">
                                 Phone Number
                             </label>
 
-                            <input
-                                type="text"
+                            <input value="<?php echo e($phone); ?>" autocomplete="tel" id="f-register-phone"
+                                type="tel" inputmode="tel"
                                 name="phone"
                                 class="form-control form-control-lg">
 
@@ -161,14 +162,14 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label for="f-register-address" class="form-label">
                                 Address
                             </label>
 
-                            <textarea
+                            <textarea autocomplete="street-address" id="f-register-address"
                                 name="address"
                                 rows="4"
-                                class="form-control"></textarea>
+                                class="form-control"><?php echo e($address); ?></textarea>
 
                         </div>
 
@@ -176,13 +177,13 @@ include 'includes/navbar.php';
 
                             <div class="col-md-6 mb-3">
 
-                                <label class="form-label">
+                                <label for="password" class="form-label">
                                     Password
                                 </label>
 
                                 <div class="input-group">
 
-                                <input
+                                <input autocomplete="new-password" minlength="8"
                                     type="password"
                                     id="password"
                                     name="password"
@@ -192,7 +193,8 @@ include 'includes/navbar.php';
                                 <button
                                     type="button"
                                     class="btn btn-outline-secondary"
-                                    onclick="togglePassword('password', this)">
+                                    onclick="togglePassword('password', this)"
+                                    aria-label="Show or hide password">
 
                                     <i class="bi bi-eye"></i>
 
@@ -204,13 +206,13 @@ include 'includes/navbar.php';
 
                             <div class="col-md-6 mb-3">
 
-                                <label class="form-label">
+                                <label for="confirm_password" class="form-label">
                                     Confirm Password
                                 </label>
 
                                 <div class="input-group">
 
-                                <input
+                                <input autocomplete="new-password" minlength="8"
                                     type="password"
                                     id="confirm_password"
                                     name="confirm_password"
@@ -220,7 +222,8 @@ include 'includes/navbar.php';
                                 <button
                                     type="button"
                                     class="btn btn-outline-secondary"
-                                    onclick="togglePassword('confirm_password', this)">
+                                    onclick="togglePassword('confirm_password', this)"
+                                    aria-label="Show or hide password">
 
                                     <i class="bi bi-eye"></i>
 

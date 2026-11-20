@@ -115,9 +115,9 @@ Back To Cart
 
                         <div class="mb-3">
 
-                            <label class="form-label">Full Name</label>
+                            <label for="f-checkout-name" class="form-label">Full Name</label>
 
-                            <input
+                            <input autocomplete="name" id="f-checkout-name"
                             type="text"
                             name="name"
                             maxlength="100"
@@ -129,9 +129,9 @@ Back To Cart
 
                         <div class="mb-3">
 
-                            <label class="form-label">Email</label>
+                            <label for="f-checkout-email" class="form-label">Email</label>
 
-                            <input
+                            <input autocomplete="email" id="f-checkout-email"
                             type="email"
                             name="email"
                             maxlength="100"
@@ -143,10 +143,10 @@ Back To Cart
 
                         <div class="mb-3">
 
-                            <label class="form-label">Phone</label>
+                            <label for="f-checkout-phone" class="form-label">Phone</label>
 
-                            <input
-                            type="text"
+                            <input autocomplete="tel" id="f-checkout-phone"
+                            type="tel" inputmode="tel"
                             name="phone"
                             maxlength="20"
                             class="form-control form-control-lg rounded-pill"
@@ -157,9 +157,9 @@ Back To Cart
 
                         <div class="mb-3">
 
-                            <label class="form-label">Address</label>
+                            <label for="f-checkout-address" class="form-label">Address</label>
 
-                            <textarea
+                            <textarea autocomplete="street-address" id="f-checkout-address"
                                 name="address"
                                 rows="5"
                                 class="form-control rounded-4"

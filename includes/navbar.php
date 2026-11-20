@@ -1,3 +1,6 @@
+<?php $__page = basename($_SERVER['SCRIPT_NAME']); ?>
+<a class="visually-hidden-focusable skip-link" href="#main">Skip to main content</a>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
 
     <div class="container">
@@ -12,7 +15,10 @@
             class="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#mainNavbar">
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
 
             <span class="navbar-toggler-icon"></span>
 
@@ -30,13 +36,15 @@
                     class="form-control rounded-pill me-2"
                     type="search"
                     name="search"
+                    aria-label="Search products"
                     placeholder="Search by product, description or category..."
                     value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
                     autocomplete="off">
 
                 <button
                     class="btn btn-primary rounded-pill px-4"
-                    type="submit">
+                    type="submit"
+                    aria-label="Search">
 
                     <i class="bi bi-search"></i>
 
@@ -48,27 +56,27 @@
             <ul class="navbar-nav ms-auto align-items-lg-center">
 
                 <li class="nav-item">
-                    <a class="nav-link active" href="index.php">Home</a>
+                    <a class="nav-link<?php echo $__page === 'index.php' ? ' active' : ''; ?>" href="index.php"<?php echo $__page === 'index.php' ? ' aria-current="page"' : ''; ?>>Home</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="shop.php">Shop</a>
+                    <a class="nav-link<?php echo $__page === 'shop.php' ? ' active' : ''; ?>" href="shop.php"<?php echo $__page === 'shop.php' ? ' aria-current="page"' : ''; ?>>Shop</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="categories.php">Categories</a>
+                    <a class="nav-link<?php echo $__page === 'categories.php' ? ' active' : ''; ?>" href="categories.php"<?php echo $__page === 'categories.php' ? ' aria-current="page"' : ''; ?>>Categories</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="deals.php">Deals</a>
+                    <a class="nav-link<?php echo $__page === 'deals.php' ? ' active' : ''; ?>" href="deals.php"<?php echo $__page === 'deals.php' ? ' aria-current="page"' : ''; ?>>Deals</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="about.php">About</a>
+                    <a class="nav-link<?php echo $__page === 'about.php' ? ' active' : ''; ?>" href="about.php"<?php echo $__page === 'about.php' ? ' aria-current="page"' : ''; ?>>About</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="contact.php">Contact</a>
+                    <a class="nav-link<?php echo $__page === 'contact.php' ? ' active' : ''; ?>" href="contact.php"<?php echo $__page === 'contact.php' ? ' aria-current="page"' : ''; ?>>Contact</a>
                 </li>
 
                 <?php if(isset($_SESSION['user_id'])){ ?>
@@ -135,7 +143,7 @@
 
                 <li class="nav-item ms-lg-3">
 
-                    <a class="nav-link" href="login.php">
+                    <a class="nav-link" href="login.php" aria-label="Login or register">
 
                         <i class="bi bi-person-circle fs-5"></i>
 
@@ -147,7 +155,7 @@
 
                 <li class="nav-item ms-lg-2">
 
-                    <a class="nav-link position-relative" href="cart.php">
+                    <a class="nav-link position-relative" href="cart.php" aria-label="Shopping cart">
 
                         <i class="bi bi-cart3 fs-5"></i>
 
@@ -174,3 +182,5 @@
     </div>
 
 </nav>
+
+<main id="main">

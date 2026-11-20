@@ -135,9 +135,9 @@ body{
 
 <div class="mb-3">
 
-<label class="form-label">Username</label>
+<label for="f-admin-login-username" class="form-label">Username</label>
 
-<input
+<input id="f-admin-login-username"
 type="text"
 name="username"
 class="form-control"
@@ -147,9 +147,9 @@ required>
 
 <div class="mb-4">
 
-<label class="form-label">Password</label>
+<label for="f-admin-login-password" class="form-label">Password</label>
 
-<input
+<input id="f-admin-login-password"
 type="password"
 name="password"
 class="form-control"

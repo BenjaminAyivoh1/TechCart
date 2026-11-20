@@ -8,41 +8,41 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int)$_SESSION['user_id'];
 
-$current = $_POST['current_password'];
-$new = $_POST['new_password'];
-$confirm = $_POST['confirm_password'];
+$current = $_POST['current_password'] ?? '';
+$new = $_POST['new_password'] ?? '';
+$confirm = $_POST['confirm_password'] ?? '';
 
-$result = mysqli_query(
-    $conn,
-    "SELECT password FROM users WHERE id=$user_id"
-);
+$stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$user = $stmt->get_result()->fetch_assoc();
 
-$user = mysqli_fetch_assoc($result);
-
-if(!password_verify($current,$user['password'])){
+if (!$user || !password_verify($current, $user['password'])) {
 
     die("Current password is incorrect.");
 
 }
 
-if($new != $confirm){
+if (strlen($new) < 8) {
+
+    die("New password must be at least 8 characters.");
+
+}
+
+if ($new !== $confirm) {
 
     die("New passwords do not match.");
 
 }
 
-$hashed = password_hash($new,PASSWORD_DEFAULT);
+$hashed = password_hash($new, PASSWORD_DEFAULT);
 
-mysqli_query(
-    $conn,
-    "UPDATE users
-    SET password='$hashed'
-    WHERE id=$user_id"
-);
+$update = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+$update->bind_param("si", $hashed, $user_id);
+$update->execute();
 
 header("Location: profile.php");
 
 exit;
-?>

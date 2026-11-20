@@ -405,3 +405,126 @@ RESPONSIVE
     }
 
 }
+
+/* ===========================
+ACCESSIBILITY + MOBILE (added)
+=========================== */
+
+/* Keyboard focus is always visible */
+a:focus-visible, button:focus-visible, .form-control:focus-visible, .form-select:focus-visible {
+    outline: 3px solid #60a5fa;
+    outline-offset: 2px;
+}
+
+.skip-link {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    z-index: 2000;
+    background: #fff;
+    color: #111827;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* Footer text must be readable on the dark background */
+footer,
+footer p,
+footer .text-light-emphasis {
+    color: #e5e7eb !important;
+}
+
+footer .footer-link {
+    padding: 10px 0;
+    margin-bottom: 0;
+}
+
+/* Touch targets: at least 44px */
+.btn,
+.form-control,
+.form-select {
+    min-height: 44px;
+}
+
+.btn {
+    min-width: 44px;
+}
+
+.btn-sm {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-toggler {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.navbar .nav-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+img {
+    max-width: 100%;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* Cart table turns into stacked cards on phones */
+@media (max-width: 768px) {
+
+    .cart-table thead {
+        display: none;
+    }
+
+    .cart-table,
+    .cart-table tbody,
+    .cart-table tr,
+    .cart-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .cart-table tr {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 16px;
+        background: #fff;
+    }
+
+    .cart-table td {
+        border: 0;
+        padding: 6px 0;
+    }
+
+    .cart-table td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: .75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6b7280;
+        margin-bottom: 2px;
+    }
+
+    .cart-table td[data-label="Product"]::before,
+    .cart-table td[data-label="Details"]::before {
+        display: none;
+    }
+
+    .cart-table td[data-label="Quantity"] .btn,
+    .cart-table td[data-label="Remove"] .btn {
+        width: auto;
+        margin-bottom: 0;
+    }
+}

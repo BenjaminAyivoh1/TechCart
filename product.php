@@ -159,7 +159,7 @@ include "includes/navbar.php";
 
 <div class="container py-5">
 
-<div class="row g-5">
+<div class="row g-4 g-lg-5">
 
 <!-- ======================================= -->
 <!-- PRODUCT IMAGE -->
@@ -368,7 +368,7 @@ value="<?php echo $product['id']; ?>">
 
 <div class="col-md-4">
 
-<input
+<input aria-label="Quantity"
 type="number"
 name="quantity"
 class="form-control"

@@ -1,0 +1,4 @@
+# The SQL dump is for importing by hand. Never serve it over the web.
+<FilesMatch "(?i)\.sql$">
+    Require all denied
+</FilesMatch>

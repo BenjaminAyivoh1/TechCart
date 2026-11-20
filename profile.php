@@ -45,13 +45,13 @@ My Profile
 
 <div class="mb-3">
 
-<label class="form-label">
+<label for="f-profile-full-name" class="form-label">
 
 Full Name
 
 </label>
 
-<input
+<input autocomplete="name" id="f-profile-full-name"
 type="text"
 name="full_name"
 class="form-control form-control-lg"
@@ -62,13 +62,13 @@ required>
 
 <div class="mb-3">
 
-<label class="form-label">
+<label for="f-profile-field" class="form-label">
 
 Email
 
 </label>
 
-<input
+<input id="f-profile-field"
 type="email"
 class="form-control form-control-lg"
 value="<?php echo htmlspecialchars($user['email']); ?>"
@@ -78,14 +78,14 @@ readonly>
 
 <div class="mb-3">
 
-<label class="form-label">
+<label for="f-profile-phone" class="form-label">
 
 Phone
 
 </label>
 
-<input
-type="text"
+<input autocomplete="tel" id="f-profile-phone"
+type="tel" inputmode="tel"
 name="phone"
 class="form-control form-control-lg"
 value="<?php echo htmlspecialchars($user['phone']); ?>">
@@ -94,13 +94,13 @@ value="<?php echo htmlspecialchars($user['phone']); ?>">
 
 <div class="mb-4">
 
-<label class="form-label">
+<label for="f-profile-address" class="form-label">
 
 Address
 
 </label>
 
-<textarea
+<textarea autocomplete="street-address" id="f-profile-address"
 name="address"
 rows="4"
 class="form-control"><?php echo htmlspecialchars($user['address']); ?></textarea>
@@ -129,13 +129,13 @@ Change Password
 
 <div class="mb-3">
 
-<label>
+<label for="f-profile-current-password">
 
 Current Password
 
 </label>
 
-<input
+<input autocomplete="current-password" id="f-profile-current-password"
 type="password"
 name="current_password"
 class="form-control">
@@ -144,13 +144,13 @@ class="form-control">
 
 <div class="mb-3">
 
-<label>
+<label for="f-profile-new-password">
 
 New Password
 
 </label>
 
-<input
+<input autocomplete="new-password" minlength="8" id="f-profile-new-password"
 type="password"
 name="new_password"
 class="form-control">
@@ -159,13 +159,13 @@ class="form-control">
 
 <div class="mb-4">
 
-<label>
+<label for="f-profile-confirm-password">
 
 Confirm Password
 
 </label>
 
-<input
+<input autocomplete="new-password" minlength="8" id="f-profile-confirm-password"
 type="password"
 name="confirm_password"
 class="form-control">

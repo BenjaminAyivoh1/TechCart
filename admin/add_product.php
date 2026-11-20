@@ -245,11 +245,11 @@ enctype="multipart/form-data">
 
 <div class="mb-3">
 
-<label class="form-label">
+<label for="f-add-product-product-name" class="form-label">
 Product Name
 </label>
 
-<input
+<input id="f-add-product-product-name"
 type="text"
 name="product_name"
 maxlength="150"
@@ -261,11 +261,11 @@ required>
 
 <div class="mb-3">
 
-<label class="form-label">
+<label for="f-add-product-description" class="form-label">
 Description
 </label>
 
-<textarea
+<textarea id="f-add-product-description"
 name="description"
 rows="4"
 class="form-control"
@@ -277,11 +277,11 @@ required><?php echo e($old['description']); ?></textarea>
 
 <div class="col-md-4">
 
-<label class="form-label">
+<label for="f-add-product-price" class="form-label">
 Price
 </label>
 
-<input
+<input id="f-add-product-price"
 type="number"
 step="0.01"
 min="0"
@@ -294,11 +294,11 @@ required>
 
 <div class="col-md-4">
 
-<label class="form-label">
+<label for="f-add-product-discount-price" class="form-label">
 Discount Price (optional)
 </label>
 
-<input
+<input id="f-add-product-discount-price"
 type="number"
 step="0.01"
 min="0"
@@ -310,11 +310,11 @@ value="<?php echo e($old['discount_price']); ?>">
 
 <div class="col-md-4">
 
-<label class="form-label">
+<label for="f-add-product-stock" class="form-label">
 Stock
 </label>
 
-<input
+<input id="f-add-product-stock"
 type="number"
 min="0"
 name="stock"
@@ -328,11 +328,11 @@ required>
 
 <div class="mt-3">
 
-<label class="form-label">
+<label for="f-add-product-category-id" class="form-label">
 Category
 </label>
 
-<select
+<select id="f-add-product-category-id"
 name="category_id"
 class="form-select"
 required>
@@ -359,11 +359,11 @@ value="<?php echo (int)$category['id']; ?>"
 
 <div class="mt-3">
 
-<label class="form-label">
+<label for="f-add-product-image" class="form-label">
 Product Image (JPG, PNG or WebP, max 2 MB)
 </label>
 
-<input
+<input id="f-add-product-image"
 type="file"
 name="image"
 class="form-control"
