@@ -376,7 +376,7 @@ Browse our collection of premium electronics.
 
 <div class="col-lg-4">
 
-<input
+<input aria-label="Search products"
 type="text"
 name="search"
 class="form-control"
@@ -387,7 +387,7 @@ value="<?php echo htmlspecialchars($search); ?>">
 
 <div class="col-lg-2">
 
-<select
+<select aria-label="Category"
 name="category"
 class="form-select">
 
@@ -419,7 +419,7 @@ value="<?php echo $cat['id']; ?>"
 
 <div class="col-lg-2">
 
-<select
+<select aria-label="Stock status"
 name="status"
 class="form-select">
 
@@ -459,7 +459,7 @@ Out Of Stock
 
 <div class="col-lg-2">
 
-<select
+<select aria-label="Sort by"
 name="sort"
 class="form-select">
 

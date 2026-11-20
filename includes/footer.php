@@ -1,3 +1,5 @@
+</main>
+
 <footer class="bg-dark text-light pt-5 pb-3 mt-5">
 
     <div class="container">
@@ -101,20 +103,20 @@
 
                 <div class="mt-3">
 
-                    <a href="#" class="social-icon">
-                        <i class="bi bi-facebook"></i>
+                    <a href="#" class="social-icon" aria-label="Facebook">
+                        <i class="bi bi-facebook" aria-hidden="true"></i>
                     </a>
 
-                    <a href="#" class="social-icon">
-                        <i class="bi bi-instagram"></i>
+                    <a href="#" class="social-icon" aria-label="Instagram">
+                        <i class="bi bi-instagram" aria-hidden="true"></i>
                     </a>
 
-                    <a href="#" class="social-icon">
-                        <i class="bi bi-twitter-x"></i>
+                    <a href="#" class="social-icon" aria-label="X (Twitter)">
+                        <i class="bi bi-twitter-x" aria-hidden="true"></i>
                     </a>
 
-                    <a href="#" class="social-icon">
-                        <i class="bi bi-linkedin"></i>
+                    <a href="#" class="social-icon" aria-label="LinkedIn">
+                        <i class="bi bi-linkedin" aria-hidden="true"></i>
                     </a>
 
                 </div>
@@ -140,8 +142,6 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Custom JS -->
-<script src="assets/js/script.js"></script>
 
 </body>
 </html>

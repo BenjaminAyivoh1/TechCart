@@ -677,6 +677,7 @@ Receive updates on new arrivals, exclusive discounts and special offers.
 <input
 type="email"
 class="form-control form-control-lg"
+aria-label="Email address for the newsletter"
 placeholder="Enter your email address">
 
 </div>

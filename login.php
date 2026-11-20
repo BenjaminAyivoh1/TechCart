@@ -13,43 +13,37 @@ if (isset($_SESSION['user_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
-    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $password = $_POST['password'];
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    $query = mysqli_query(
-        $conn,
-        "SELECT * FROM users WHERE email='$email' LIMIT 1"
-    );
+    try {
 
-    if (mysqli_num_rows($query) == 1) {
+        $stmt = $conn->prepare("SELECT id, full_name, email, password FROM users WHERE email = ? LIMIT 1");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $user = $stmt->get_result()->fetch_assoc();
 
-        $user = mysqli_fetch_assoc($query);
+    } catch (Throwable $e) {
 
-        if (password_verify($password, $user['password'])) {
-
-            // New session ID after login prevents session fixation
-            session_regenerate_id(true);
-
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['full_name'];
-            $_SESSION['user_email'] = $user['email'];
-
-            header("Location: index.php");
-            exit;
-
-        } else {
-
-            // Same message as "no such account" so emails can't be probed
-            $error = "Incorrect email or password.";
-
-        }
-
-    } else {
-
-        $error = "Incorrect email or password.";
-
+        error_log("TechCart login failed: " . $e->getMessage());
+        $user = null;
     }
 
+    if ($user && password_verify($password, $user['password'])) {
+
+        // New session ID after login prevents session fixation
+        session_regenerate_id(true);
+
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['full_name'];
+        $_SESSION['user_email'] = $user['email'];
+
+        header("Location: index.php");
+        exit;
+    }
+
+    // Same message for "no such account" and "wrong password" so emails can't be probed
+    $error = "Incorrect email or password.";
 }
 
 $pageTitle = 'Login';
@@ -119,13 +113,13 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">
+                            <label for="f-login-email" class="form-label">
 
                                 Email Address
 
                             </label>
 
-                            <input
+                            <input autocomplete="email" id="f-login-email"
                                 type="email"
                                 name="email"
                                 class="form-control form-control-lg"
@@ -135,7 +129,7 @@ include 'includes/navbar.php';
 
                         <div class="mb-4">
 
-                            <label class="form-label">
+                            <label for="password" class="form-label">
 
                                 Password
 
@@ -143,7 +137,7 @@ include 'includes/navbar.php';
 
                             <div class="input-group">
 
-                                <input
+                                <input autocomplete="current-password"
                                     type="password"
                                     id="password"
                                     name="password"
@@ -153,7 +147,8 @@ include 'includes/navbar.php';
                                 <button
                                     type="button"
                                     class="btn btn-outline-secondary"
-                                    onclick="togglePassword('password', this)">
+                                    onclick="togglePassword('password', this)"
+                                    aria-label="Show or hide password">
 
                                     <i class="bi bi-eye"></i>
 

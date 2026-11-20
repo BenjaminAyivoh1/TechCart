@@ -257,9 +257,9 @@ body{
 
 <div class="mb-3">
 
-<label>Product Name</label>
+<label for="f-edit-product-product-name">Product Name</label>
 
-<input
+<input id="f-edit-product-product-name"
 type="text"
 name="product_name"
 maxlength="150"
@@ -271,9 +271,9 @@ required>
 
 <div class="mb-3">
 
-<label>Description</label>
+<label for="f-edit-product-description">Description</label>
 
-<textarea
+<textarea id="f-edit-product-description"
 name="description"
 class="form-control"
 rows="5"
@@ -285,9 +285,9 @@ required><?php echo e($old['description']); ?></textarea>
 
 <div class="col-md-4">
 
-<label>Price</label>
+<label for="f-edit-product-price">Price</label>
 
-<input
+<input id="f-edit-product-price"
 type="number"
 step="0.01"
 min="0"
@@ -300,9 +300,9 @@ required>
 
 <div class="col-md-4">
 
-<label>Discount Price (optional)</label>
+<label for="f-edit-product-discount-price">Discount Price (optional)</label>
 
-<input
+<input id="f-edit-product-discount-price"
 type="number"
 step="0.01"
 min="0"
@@ -314,9 +314,9 @@ value="<?php echo e($old['discount_price']); ?>">
 
 <div class="col-md-4">
 
-<label>Stock</label>
+<label for="f-edit-product-stock">Stock</label>
 
-<input
+<input id="f-edit-product-stock"
 type="number"
 min="0"
 name="stock"
@@ -330,9 +330,9 @@ required>
 
 <div class="mt-3">
 
-<label>Category</label>
+<label for="f-edit-product-category-id">Category</label>
 
-<select
+<select id="f-edit-product-category-id"
 name="category_id"
 class="form-select">
 
@@ -372,13 +372,13 @@ alt="<?php echo e($product['product_name']); ?>">
 
 <div class="mt-3">
 
-<label>
+<label for="f-edit-product-image">
 
 Upload New Image (optional, JPG, PNG or WebP, max 2 MB)
 
 </label>
 
-<input
+<input id="f-edit-product-image"
 type="file"
 name="image"
 class="form-control"

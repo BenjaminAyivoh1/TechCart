@@ -102,7 +102,7 @@ Start Shopping
 
 <div class="table-responsive">
 
-<table class="table align-middle">
+<table class="table align-middle cart-table">
 
     <thead class="table-dark">
 
@@ -176,7 +176,7 @@ foreach ($_SESSION['cart'] as $id => $qty) {
 
 <tr>
 
-<td>
+<td data-label="Product">
 
 <img
 src="assets/images/<?php echo htmlspecialchars($product['image']); ?>"
@@ -186,7 +186,7 @@ alt="<?php echo htmlspecialchars($product['product_name']); ?>">
 
 </td>
 
-<td>
+<td data-label="Details">
 
 <h5 class="fw-bold mb-1">
 
@@ -208,7 +208,7 @@ Tech Product
 
 </td>
 
-<td>
+<td data-label="Price">
 
 <h5 class="text-primary fw-bold">
 
@@ -228,13 +228,14 @@ $<?php echo number_format($product['price'],2); ?>
 
 </td>
 
-<td>
+<td data-label="Quantity">
 
 <div class="d-flex align-items-center">
 
 <a
 href="update_cart.php?id=<?php echo $id; ?>&action=decrease"
-class="btn btn-outline-secondary btn-sm">
+class="btn btn-outline-secondary btn-sm"
+aria-label="Decrease quantity">
 
 <i class="bi bi-dash"></i>
 
@@ -248,7 +249,8 @@ class="btn btn-outline-secondary btn-sm">
 
 <a
 href="update_cart.php?id=<?php echo $id; ?>&action=increase"
-class="btn btn-outline-primary btn-sm">
+class="btn btn-outline-primary btn-sm"
+aria-label="Increase quantity">
 
 <i class="bi bi-plus"></i>
 
@@ -258,7 +260,7 @@ class="btn btn-outline-primary btn-sm">
 
 </td>
 
-<td>
+<td data-label="Subtotal">
 
 <h5 class="fw-bold text-success">
 
@@ -268,11 +270,12 @@ $<?php echo number_format($subtotal,2); ?>
 
 </td>
 
-<td>
+<td data-label="Remove">
 
 <a
 href="remove_from_cart.php?id=<?php echo $id; ?>"
 class="btn btn-outline-danger"
+aria-label="Remove <?php echo htmlspecialchars($product['product_name']); ?> from cart"
 onclick="return confirm('Remove this item from cart?')">
 
 <i class="bi bi-trash"></i>

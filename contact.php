@@ -38,9 +38,9 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">Full Name</label>
+                            <label for="contact-name" class="form-label">Full Name</label>
 
-                            <input
+                            <input id="contact-name"
                                 type="text"
                                 class="form-control"
                                 placeholder="John Doe">
@@ -49,9 +49,9 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">Email</label>
+                            <label for="contact-email" class="form-label">Email</label>
 
-                            <input
+                            <input id="contact-email"
                                 type="email"
                                 class="form-control"
                                 placeholder="john@example.com">
@@ -60,9 +60,9 @@ include 'includes/navbar.php';
 
                         <div class="mb-3">
 
-                            <label class="form-label">Subject</label>
+                            <label for="contact-subject" class="form-label">Subject</label>
 
-                            <input
+                            <input id="contact-subject"
                                 type="text"
                                 class="form-control"
                                 placeholder="How can we help?">
@@ -71,9 +71,9 @@ include 'includes/navbar.php';
 
                         <div class="mb-4">
 
-                            <label class="form-label">Message</label>
+                            <label for="contact-message" class="form-label">Message</label>
 
-                            <textarea
+                            <textarea id="contact-message"
                                 class="form-control"
                                 rows="6"
                                 placeholder="Write your message here..."></textarea>
